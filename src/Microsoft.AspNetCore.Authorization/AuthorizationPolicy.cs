@@ -122,8 +122,14 @@ namespace Microsoft.AspNetCore.Authorization
 
             var policyBuilder = new AuthorizationPolicyBuilder();
             var any = false;
-            foreach (var authorizeAttribute in authorizeData.OfType<AuthorizeAttribute>())
+            foreach (var authorizeDatum in authorizeData)
             {
+                var authorizeAttribute = authorizeDatum as AuthorizeAttribute;
+                if (authorizeAttribute == null)
+                {
+                    continue;
+                }
+
                 any = true;
                 var useDefaultPolicy = true;
                 if (!string.IsNullOrWhiteSpace(authorizeAttribute.Policy))
