@@ -124,33 +124,26 @@ namespace Microsoft.AspNetCore.Authorization
             var any = false;
             foreach (var authorizeDatum in authorizeData)
             {
-                // We're not using System.Linq.OfType here because it allocates and hurts performance.
-                var authorizeAttribute = authorizeDatum as AuthorizeAttribute;
-                if (authorizeAttribute == null)
-                {
-                    continue;
-                }
-
                 any = true;
                 var useDefaultPolicy = true;
-                if (!string.IsNullOrWhiteSpace(authorizeAttribute.Policy))
+                if (!string.IsNullOrWhiteSpace(authorizeDatum.Policy))
                 {
-                    var policy = await policyProvider.GetPolicyAsync(authorizeAttribute.Policy);
+                    var policy = await policyProvider.GetPolicyAsync(authorizeDatum.Policy);
                     if (policy == null)
                     {
-                        throw new InvalidOperationException(Resources.FormatException_AuthorizationPolicyNotFound(authorizeAttribute.Policy));
+                        throw new InvalidOperationException(Resources.FormatException_AuthorizationPolicyNotFound(authorizeDatum.Policy));
                     }
                     policyBuilder.Combine(policy);
                     useDefaultPolicy = false;
                 }
-                var rolesSplit = authorizeAttribute.Roles?.Split(',');
+                var rolesSplit = authorizeDatum.Roles?.Split(',');
                 if (rolesSplit != null && rolesSplit.Any())
                 {
                     var trimmedRolesSplit = rolesSplit.Where(r => !string.IsNullOrWhiteSpace(r)).Select(r => r.Trim());
                     policyBuilder.RequireRole(trimmedRolesSplit);
                     useDefaultPolicy = false;
                 }
-                var authTypesSplit = authorizeAttribute.ActiveAuthenticationSchemes?.Split(',');
+                var authTypesSplit = authorizeDatum.ActiveAuthenticationSchemes?.Split(',');
                 if (authTypesSplit != null && authTypesSplit.Any())
                 {
                     foreach (var authType in authTypesSplit)
