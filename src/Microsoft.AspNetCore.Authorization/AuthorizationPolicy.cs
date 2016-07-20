@@ -124,6 +124,7 @@ namespace Microsoft.AspNetCore.Authorization
             var any = false;
             foreach (var authorizeDatum in authorizeData)
             {
+                // We're not using System.Linq.OfType here because it allocates and hurts performance.
                 var authorizeAttribute = authorizeDatum as AuthorizeAttribute;
                 if (authorizeAttribute == null)
                 {
